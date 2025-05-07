@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h3>Subir archivo (.xlsx o .csv)</h3>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="mb-3">
+            <input type="file" name="file" class="form-control" accept=".xlsx,.csv" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Subir</button>
+    </form>
+
+    {% if error %}
+        <div class="alert alert-danger mt-3">{{ error }}</div>
+    {% endif %}
+
+    {% if data %}
+        <hr>
+        <h4>Datos cargados:</h4>
+        <!-- Aquí irá la tabla más adelante -->
+    {% endif %}
+</div>
+{% endblock %}

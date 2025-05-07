@@ -1,0 +1,8 @@
+<nav class="navbar navbar-light bg-light mb-4">
+    <div class="container">
+        <span class="navbar-text">
+            Bienvenido, {{ request.user.get_full_name|default:request.user.email }}
+        </span>
+        <a class="btn btn-outline-danger" href="{% url 'logout' %}">Logout</a>
+    </div>
+</nav>
