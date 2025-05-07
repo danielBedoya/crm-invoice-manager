@@ -2,6 +2,8 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
+from dashboard.utils.file_processor import process_excel_file, process_csv_file
+
 
 class DashboardView(LoginRequiredMixin, TemplateView):
     """
@@ -63,9 +65,15 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                 },
             )
 
-        # Aquí va el procesamiento del archivo más adelante
+        data = []
+
+        if uploaded_file.name.endswith(".xlsx"):
+            data, error = process_excel_file(uploaded_file)
+        elif uploaded_file.name.endswith(".csv"):
+            data, error = process_csv_file(uploaded_file)
+
         return render(
             request,
             self.template_name,
-            {"data": "Archivo recibido correctamente (pendiente procesar)."},
+            {"data": data, "error": error},
         )
