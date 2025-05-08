@@ -42,8 +42,6 @@ class DashboardView(LoginRequiredMixin, View):
             page_number = request.GET.get("page", 1)
             page_obj = paginator.get_page(page_number)
 
-            for item in page_obj:
-                print(item)
             return render(request, self.template_name, {"page_obj": page_obj, "q": q})
         
         return render(request, self.template_name)

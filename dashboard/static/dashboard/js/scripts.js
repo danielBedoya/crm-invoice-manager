@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function toggleReportButton() {
         const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
         if (checkedCount >= 2) {
-            reportButtonContainer.style.display = 'block';
+            reportButtonContainer.style.display = 'flex';
         } else {
             reportButtonContainer.style.display = 'none';
         }
@@ -17,4 +17,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Check on page load
     toggleReportButton();
+
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(function (alert) {
+      setTimeout(() => {
+        alert.style.transition = "opacity 0.5s ease-out";
+        alert.style.opacity = "0";
+        setTimeout(() => alert.remove(), 500);
+      }, 4000);
+    });
 });
