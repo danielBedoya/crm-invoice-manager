@@ -1,29 +1,44 @@
-<form method="get" class="mt-4 mb-3">
-    <input type="text" name="q" class="form-control" placeholder="Buscar por nombre, apellido, documento o carro" value="{{ request.GET.q }}">
-</form>
+{% include 'partials/_search.html' %}
 {% if page_obj %}
     <hr>
     <h4>Datos cargados:</h4>
-    <table class="table table-bordered table-striped mt-3">
-        <thead class="table-dark">
-            <tr>
-                <th>#</th>
-                {% for key in page_obj.object_list.0.keys %}
-                    <th>{{ key }}</th>
-                {% endfor %}
-            </tr>
-        </thead>
-        <tbody>
-            {% for row in page_obj %}
+    {% if page_obj.object_list and page_obj.object_list.0 %}
+    <div class="table-container" style="min-height: 400px;">
+    <form id="column-selection-form" method="post" class="mb-3">
+        {% csrf_token %}
+        <div class="table-responsive">
+        <table class="table table-bordered table-striped mt-3">
+            <thead class="table-dark">
                 <tr>
-                    <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
-                    {% for value in row.values %}
-                        <td>{{ value }}</td>
+                    <th class="text-nowrap">#</th>
+                    {% for key in page_obj.object_list.0.keys %}
+                        <th class="text-nowrap">
+                            <label class="form-check-label" for="cb_{{ key }}">
+                                <input class="form-check-input me-1" type="checkbox" name="columns" value="{{ key }}" id="cb_{{ key }}">
+                                {{ key }}
+                            </label>
+                        </th>
                     {% endfor %}
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for row in page_obj %}
+                    <tr>
+                        <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
+                        {% for value in row.values %}
+                            <td>{{ value }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+    </form>
+    <div id="report-button-container" class="fixed-button sticky-footer bg-white p-2 border-top" style="display: none;">
+        <button type="submit" formmethod="post" class="btn btn-primary" form="column-selection-form">Generar reporte con columnas seleccionadas</button>
+    </div>
+    </div>
+    {% endif %}
 
     <nav aria-label="Paginación">
         <ul class="pagination justify-content-center">
