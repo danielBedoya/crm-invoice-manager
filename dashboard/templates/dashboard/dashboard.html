@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
 <div class="container mt-4">
@@ -15,10 +16,6 @@
         <div class="alert alert-danger mt-3">{{ error }}</div>
     {% endif %}
 
-    {% if data %}
-        <hr>
-        <h4>Datos cargados:</h4>
-        <!-- Aquí irá la tabla más adelante -->
-    {% endif %}
+    {% include 'partials/_table.html' %}
 </div>
 {% endblock %}

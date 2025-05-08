@@ -1,11 +1,13 @@
 from django.shortcuts import render
-from django.views.generic import TemplateView
+from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.paginator import Paginator
 
 from dashboard.utils.file_processor import process_excel_file, process_csv_file
+from dashboard.utils.search_utils import filter_data
 
 
-class DashboardView(LoginRequiredMixin, TemplateView):
+class DashboardView(LoginRequiredMixin, View):
     """
     Main dashboard view for authenticated users.
 
@@ -28,6 +30,22 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         Returns:
             HttpResponse: The rendered dashboard page.
         """
+        q = request.GET.get("q")
+        data = request.session.get("data", [])
+
+        if q:
+            data = filter_data(data, q)
+        
+        if data:
+            # Paginate the data
+            paginator = Paginator(data, 20)
+            page_number = request.GET.get("page", 1)
+            page_obj = paginator.get_page(page_number)
+
+            for item in page_obj:
+                print(item)
+            return render(request, self.template_name, {"page_obj": page_obj, "q": q})
+        
         return render(request, self.template_name)
 
     def post(self, request):
@@ -71,9 +89,14 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             data, error = process_excel_file(uploaded_file)
         elif uploaded_file.name.endswith(".csv"):
             data, error = process_csv_file(uploaded_file)
+        
+        if error:
+            return render(request, self.template_name, {"error": error})
+        
+        request.session["data"] = data
 
-        return render(
-            request,
-            self.template_name,
-            {"data": data, "error": error},
-        )
+        paginator = Paginator(data, 20)
+        page_number = request.GET.get("page", 1)
+        page_obj = paginator.get_page(page_number)
+
+        return render(request, self.template_name, {"page_obj": page_obj})

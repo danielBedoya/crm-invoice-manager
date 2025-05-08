@@ -1,0 +1,65 @@
+<form method="get" class="mt-4 mb-3">
+    <input type="text" name="q" class="form-control" placeholder="Buscar por nombre, apellido, documento o carro" value="{{ request.GET.q }}">
+</form>
+{% if page_obj %}
+    <hr>
+    <h4>Datos cargados:</h4>
+    <table class="table table-bordered table-striped mt-3">
+        <thead class="table-dark">
+            <tr>
+                <th>#</th>
+                {% for key in page_obj.object_list.0.keys %}
+                    <th>{{ key }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in page_obj %}
+                <tr>
+                    <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
+                    {% for value in row.values %}
+                        <td>{{ value }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <nav aria-label="Paginación">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Anterior">
+                        &laquo;
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% else %}
+                    <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Siguiente">
+                        &raquo;
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled"><sp  an class="page-link">&raquo;</span></li>
+            {% endif %}
+        </ul>
+    </nav>
+{% else %}
+    {% if q %}
+        <div class="alert alert-warning">No se encontraron resultados para tu búsqueda.</div>
+    {% else %}
+        <div class="alert alert-info">No hay datos cargados.</div>
+    {% endif %}
+{% endif %} 

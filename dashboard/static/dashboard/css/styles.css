@@ -1,0 +1,5 @@
+/* Resalta fila al pasar el cursor */
+table tbody tr:hover td {
+    background-color: #f2f2f2 !important;
+    cursor: pointer;
+}
