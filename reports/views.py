@@ -4,6 +4,10 @@ from django.http import HttpResponse
 from django.views import View
 from .tasks import generate_and_send_report
 from django.contrib import messages
+import logging
+
+logger = logging.getLogger('reports')
+
 
 class ReportView(LoginRequiredMixin, View):
     """
@@ -29,15 +33,24 @@ class ReportView(LoginRequiredMixin, View):
         Returns:
             HttpResponse: A response indicating the status of the report generation request.
         """
-        data = request.session.get("data", [])
-        if not data:
-            return HttpResponse("No hay datos disponibles para generar el reporte.", status=400)
+        try:
+            user_email = request.user.email
+            selected_columns = request.POST.getlist('columns')
+            format = request.POST.get('format', 'csv')
+            data = request.session.get("data", [])
 
-        selected_columns = request.POST.getlist('columns')
-        format = request.POST.get('format', 'csv')
+            logger.info(f"Report request by {user_email} for columns: {selected_columns}")
 
-        user_email = request.user.email
-        generate_and_send_report.delay(user_email, selected_columns, data, format)
+            if not data:
+                logger.info("No data found")
+                return HttpResponse("No hay datos disponibles para generar el reporte.", status=400)
 
-        messages.success(request, "Tu reporte está siendo procesado y será enviado a tu correo.")
-        return redirect('dashboard')
+            generate_and_send_report.delay(user_email, selected_columns, data, format)
+
+            messages.success(request, "Tu reporte está siendo procesado y será enviado a tu correo.")
+            return redirect('dashboard')
+
+        except Exception as e:
+            logger.exception("Error while processing report request")
+            messages.error(request, f"Ocurrió un error al procesar el reporte: {str(e)}")
+            return redirect('dashboard')

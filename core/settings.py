@@ -155,3 +155,96 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'danielbedoyatests@gmail.com'
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_PASS', 'default_password')  # Use environment variable for security
 DEFAULT_FROM_EMAIL = 'danielbedoyatests@gmail.com'
+
+# Logging configuration
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{asctime} [{levelname}] {name} - {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'accounts_file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'log/accounts.log'),
+            'formatter': 'verbose',
+        },
+        'clients_file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'log/clients.log'),
+            'formatter': 'verbose',
+        },
+        'vehicles_file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'log/vehicles.log'),
+            'formatter': 'verbose',
+        },
+        'contracts_file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'log/contracts.log'),
+            'formatter': 'verbose',
+        },
+        'invoices_file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'log/invoices.log'),
+            'formatter': 'verbose',
+        },
+        'reports_file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'log/reports.log'),
+            'formatter': 'verbose',
+        },
+        'dashboard_file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'log/dashboard.log'),
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'accounts': {
+            'handlers': ['accounts_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'clients': {
+            'handlers': ['clients_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'vehicles': {
+            'handlers': ['vehicles_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'contracts': {
+            'handlers': ['contracts_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'invoices': {
+            'handlers': ['invoices_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'reports': {
+            'handlers': ['reports_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'dashboard': {
+            'handlers': ['dashboard_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+}

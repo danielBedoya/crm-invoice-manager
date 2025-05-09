@@ -1,6 +1,9 @@
 from django.contrib.auth.views import LoginView, LogoutView
 from .forms import LoginForm
 from django.urls import reverse_lazy
+import logging
+
+logger = logging.getLogger('accounts')
 
 class CustomLoginView(LoginView):
     """
@@ -17,6 +20,17 @@ class CustomLoginView(LoginView):
     template_name = 'accounts/login.html'
     authentication_form = LoginForm
     redirect_authenticated_user = True
+
+    def form_valid(self, form):
+        """Log successful login and proceed with normal behavior."""
+        user = form.get_user()
+        logger.info(f"User logged in successfully: {user.email}")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        """Log failed login attempt and return invalid form response."""
+        logger.warning("Invalid login attempt.")
+        return super().form_invalid(form)
 
 class CustomLogoutView(LogoutView):
     """

@@ -1,11 +1,4 @@
 {% include 'partials/_search.html' %}
-{% if messages %}
-  {% for message in messages %}
-    {% if forloop.last %}
-      <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-    {% endif %}
-  {% endfor %}
-{% endif %}
 {% if page_obj %}
     <hr>
     <h4>Datos cargados:</h4>
@@ -40,18 +33,18 @@
             </tbody>
         </table>
         </div>
-    </form>
-    <div id="report-button-container" class="fixed-button sticky-footer bg-white p-2 border-top align-items-center" style="display: none;">
-        <button type="submit" formmethod="post" class="btn btn-primary me-3" form="column-selection-form">Generar reporte con columnas seleccionadas</button>
-        <div class="d-flex align-items-center">
-            <label for="format" class="me-2 mb-0">Formato:</label>
-            <select name="format" id="format" class="form-control">
-                <option value="csv">CSV</option>
-                <option value="xlsx">XLSX</option>
-            </select>
+        <div id="report-button-container" class="fixed-button sticky-footer bg-white p-2 border-top align-items-center" style="display: none;">
+            <button type="submit" formmethod="post" class="btn btn-primary me-3" form="column-selection-form">Generar reporte con columnas seleccionadas</button>
+            <div class="d-flex align-items-center">
+                <label for="format" class="me-2 mb-0">Formato:</label>
+                <select name="format" id="format" class="form-control">
+                    <option value="csv">CSV</option>
+                    <option value="xlsx">XLSX</option>
+                </select>
+            </div>
         </div>
-    </div>
-    </div>
+        </div>
+    </form>
     {% endif %}
 
     <nav aria-label="Paginación">

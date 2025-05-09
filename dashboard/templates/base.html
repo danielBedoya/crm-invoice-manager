@@ -9,6 +9,13 @@
 </head>
 <body>
     {% include 'partials/_header.html' %}
+    {% if messages %}
+        {% for message in messages %}
+            {% if forloop.last %}
+            <div class="container alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
     <main class="container mt-4">
         {% block content %}{% endblock %}
     </main>

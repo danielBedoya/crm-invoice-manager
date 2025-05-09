@@ -2,9 +2,12 @@ from django.shortcuts import render
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
+import logging
 
 from dashboard.utils.file_processor import process_excel_file, process_csv_file
 from dashboard.utils.search_utils import filter_data
+
+logger = logging.getLogger('dashboard')
 
 
 class DashboardView(LoginRequiredMixin, View):
@@ -58,43 +61,54 @@ class DashboardView(LoginRequiredMixin, View):
         Returns:
             HttpResponse: The rendered dashboard page with error or success messages.
         """
-        uploaded_file = request.FILES.get("file")
-        if not uploaded_file:
-            return render(
-                request, self.template_name, {"error": "No se subió ningún archivo."}
-            )
+        try:
+            uploaded_file = request.FILES.get("file")
+            if not uploaded_file:
+                logger.warning("No file was uploaded.")
+                return render(
+                    request, self.template_name, {"error": "No se subió ningún archivo."}
+                )
 
-        if not uploaded_file.name.endswith((".csv", ".xlsx")):
+            if not uploaded_file.name.endswith((".csv", ".xlsx")):
+                logger.warning(f"Unsupported file type uploaded: {uploaded_file.name}")
+                return render(
+                    request,
+                    self.template_name,
+                    {"error": "Formato no válido. Solo se permiten .csv o .xlsx"},
+                )
+
+            if uploaded_file.size > 5 * 1024 * 1024:
+                logger.warning(f"File exceeds 5MB: {uploaded_file.name}")
+                return render(
+                    request,
+                    self.template_name,
+                    {
+                        "error": "El archivo supera los 5MB. Procesamiento por lotes no implementado aún."
+                    },
+                )
+
+            logger.info(f"Processing uploaded file: {uploaded_file.name}")
+
+            if uploaded_file.name.endswith(".xlsx"):
+                data, error = process_excel_file(uploaded_file)
+            elif uploaded_file.name.endswith(".csv"):
+                data, error = process_csv_file(uploaded_file)
+
+            if error:
+                logger.error(f"File processing error: {error}")
+                return render(request, self.template_name, {"error": error})
+
+            request.session["data"] = data
+            paginator = Paginator(data, 20)
+            page_number = request.GET.get("page", 1)
+            page_obj = paginator.get_page(page_number)
+
+            return render(request, self.template_name, {"page_obj": page_obj})
+
+        except Exception as e:
+            logger.exception("Unexpected error during file upload")
             return render(
                 request,
                 self.template_name,
-                {"error": "Formato no válido. Solo se permiten .csv o .xlsx"},
+                {"error": f"Ocurrió un error inesperado al procesar el archivo: {str(e)}"},
             )
-
-        if uploaded_file.size > 5 * 1024 * 1024:
-            # Lógica futura para procesamiento por lotes
-            return render(
-                request,
-                self.template_name,
-                {
-                    "error": "El archivo supera los 5MB. Procesamiento por lotes no implementado aún."
-                },
-            )
-
-        data = []
-
-        if uploaded_file.name.endswith(".xlsx"):
-            data, error = process_excel_file(uploaded_file)
-        elif uploaded_file.name.endswith(".csv"):
-            data, error = process_csv_file(uploaded_file)
-        
-        if error:
-            return render(request, self.template_name, {"error": error})
-        
-        request.session["data"] = data
-
-        paginator = Paginator(data, 20)
-        page_number = request.GET.get("page", 1)
-        page_obj = paginator.get_page(page_number)
-
-        return render(request, self.template_name, {"page_obj": page_obj})

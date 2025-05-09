@@ -8,3 +8,4 @@ db.sqlite3
 *.log
 launch.json
 dump.rdb
+log/
