@@ -1,9 +1,13 @@
 import openpyxl, io
+import logging
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 
 from dashboard.utils.file_processor import process_excel_file, process_csv_file
 from dashboard.constants import REQUIRED_COLUMNS
+
+logger = logging.getLogger(__name__)
+
 
 class ProcessFileTests(TestCase):
     def create_excel_file_with_columns(self, columns, rows):
@@ -49,13 +53,18 @@ class ProcessFileTests(TestCase):
         Raises:
             AssertionError: If any of the assertions fail.
         """
+        logger.info("Running test_process_excel_file_valid")
         columns = list(REQUIRED_COLUMNS)
         rows = [
             ["John", "Doe", "123456", "Toyota"],
             ["Jane", "Smith", "654321", "Honda"],
         ]
         excel_file = self.create_excel_file_with_columns(columns, rows)
-        uploaded_file = SimpleUploadedFile("test.xlsx", excel_file.read(), content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        uploaded_file = SimpleUploadedFile(
+            "test.xlsx",
+            excel_file.read(),
+            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
         data, error = process_excel_file(uploaded_file)
         assert error is None
         assert isinstance(data, list)
@@ -63,6 +72,7 @@ class ProcessFileTests(TestCase):
         for d in data:
             for col in columns:
                 assert col in d
+        logger.info("test_process_excel_file_valid passed")
 
     def test_process_excel_file_missing_columns(self):
         """
@@ -81,17 +91,23 @@ class ProcessFileTests(TestCase):
         Raises:
             AssertionError: If any of the assertions fail.
         """
+        logger.info("Running test_process_excel_file_missing_columns")
         columns = ["Nombre", "Apellido"]  # Missing some required columns
         rows = [
             ["John", "Doe"],
         ]
         excel_file = self.create_excel_file_with_columns(columns, rows)
-        uploaded_file = SimpleUploadedFile("test.xlsx", excel_file.read(), content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        uploaded_file = SimpleUploadedFile(
+            "test.xlsx",
+            excel_file.read(),
+            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
         data, error = process_excel_file(uploaded_file)
         assert data is None
         for col in REQUIRED_COLUMNS:
             if col not in columns:
                 assert col in error
+        logger.info("test_process_excel_file_missing_columns passed")
 
     def test_process_csv_file_valid(self):
         """
@@ -112,6 +128,7 @@ class ProcessFileTests(TestCase):
         Raises:
             AssertionError: If any of the assertions fail.
         """
+        logger.info("Running test_process_csv_file_valid")
         columns = list(REQUIRED_COLUMNS)
         rows = [
             ["John", "Doe", "123456", "Toyota"],
@@ -120,7 +137,9 @@ class ProcessFileTests(TestCase):
         csv_content = ",".join(columns) + "\n"
         for row in rows:
             csv_content += ",".join(row) + "\n"
-        uploaded_file = SimpleUploadedFile("test.csv", csv_content.encode("utf-8"), content_type="text/csv")
+        uploaded_file = SimpleUploadedFile(
+            "test.csv", csv_content.encode("utf-8"), content_type="text/csv"
+        )
         data, error = process_csv_file(uploaded_file)
         assert error is None
         assert isinstance(data, list)
@@ -128,6 +147,7 @@ class ProcessFileTests(TestCase):
         for d in data:
             for col in columns:
                 assert col in d
+        logger.info("test_process_csv_file_valid passed")
 
     def test_process_csv_file_missing_columns(self):
         """
@@ -146,6 +166,7 @@ class ProcessFileTests(TestCase):
         Raises:
             AssertionError: If any of the assertions fail.
         """
+        logger.info("Running test_process_csv_file_missing_columns")
         columns = ["Nombre", "Apellido"]  # Missing some required columns
         rows = [
             ["John", "Doe"],
@@ -153,9 +174,12 @@ class ProcessFileTests(TestCase):
         csv_content = ",".join(columns) + "\n"
         for row in rows:
             csv_content += ",".join(row) + "\n"
-        uploaded_file = SimpleUploadedFile("test.csv", csv_content.encode("utf-8"), content_type="text/csv")
+        uploaded_file = SimpleUploadedFile(
+            "test.csv", csv_content.encode("utf-8"), content_type="text/csv"
+        )
         data, error = process_csv_file(uploaded_file)
         assert data is None
         for col in REQUIRED_COLUMNS:
             if col not in columns:
                 assert col in error
+        logger.info("test_process_csv_file_missing_columns passed")

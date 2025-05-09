@@ -7,7 +7,7 @@ import logging
 from dashboard.utils.file_processor import process_excel_file, process_csv_file
 from dashboard.utils.search_utils import filter_data
 
-logger = logging.getLogger('dashboard')
+logger = logging.getLogger("dashboard")
 
 
 class DashboardView(LoginRequiredMixin, View):
@@ -33,21 +33,35 @@ class DashboardView(LoginRequiredMixin, View):
         Returns:
             HttpResponse: The rendered dashboard page.
         """
-        q = request.GET.get("q")
-        data = request.session.get("data", [])
+        try:
+            q = request.GET.get("q")
+            data = request.session.get("data", [])
 
-        if q:
-            data = filter_data(data, q)
-        
-        if data:
-            # Paginate the data
-            paginator = Paginator(data, 20)
-            page_number = request.GET.get("page", 1)
-            page_obj = paginator.get_page(page_number)
+            if q:
+                logger.info(f"Search query received: '{q}'")
+                data = filter_data(data, q)
 
-            return render(request, self.template_name, {"page_obj": page_obj, "q": q})
-        
-        return render(request, self.template_name)
+            if data:
+                paginator = Paginator(data, 20)
+                page_number = request.GET.get("page", 1)
+                logger.info(f"Paginating dashboard data. Page: {page_number}")
+                page_obj = paginator.get_page(page_number)
+                return render(
+                    request, self.template_name, {"page_obj": page_obj, "q": q}
+                )
+
+            logger.info("No data available in session for dashboard.")
+            return render(request, self.template_name)
+
+        except Exception as e:
+            logger.exception("Unexpected error during GET request to dashboard")
+            return render(
+                request,
+                self.template_name,
+                {
+                    "error": f"Ocurrió un error inesperado al cargar el dashboard: {str(e)}"
+                },
+            )
 
     def post(self, request):
         """
@@ -66,7 +80,9 @@ class DashboardView(LoginRequiredMixin, View):
             if not uploaded_file:
                 logger.warning("No file was uploaded.")
                 return render(
-                    request, self.template_name, {"error": "No se subió ningún archivo."}
+                    request,
+                    self.template_name,
+                    {"error": "No se subió ningún archivo."},
                 )
 
             if not uploaded_file.name.endswith((".csv", ".xlsx")):
@@ -110,5 +126,7 @@ class DashboardView(LoginRequiredMixin, View):
             return render(
                 request,
                 self.template_name,
-                {"error": f"Ocurrió un error inesperado al procesar el archivo: {str(e)}"},
+                {
+                    "error": f"Ocurrió un error inesperado al procesar el archivo: {str(e)}"
+                },
             )

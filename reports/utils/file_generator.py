@@ -2,6 +2,7 @@ from openpyxl import Workbook
 from io import BytesIO, TextIOWrapper
 import csv
 
+
 def generate_excel(columns, data):
     """
     Generates an Excel file with the specified columns and data.
@@ -20,11 +21,16 @@ def generate_excel(columns, data):
     ws = wb.active
     ws.append(columns)
     for row in data:
-        ws.append([row.get(col, '') for col in columns])
+        ws.append([row.get(col, "") for col in columns])
     output = BytesIO()
     wb.save(output)
     output.seek(0)
-    return output, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'reporte.xlsx'
+    return (
+        output,
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "reporte.xlsx",
+    )
+
 
 def generate_csv(columns, data):
     """
@@ -41,12 +47,14 @@ def generate_csv(columns, data):
             - str: The suggested filename ('reporte.csv').
     """
     output = BytesIO()
-    text_output = TextIOWrapper(output, encoding='utf-8', newline='', line_buffering=True)
+    text_output = TextIOWrapper(
+        output, encoding="utf-8", newline="", line_buffering=True
+    )
     writer = csv.writer(text_output)
     writer.writerow(columns)
     for row in data:
-        writer.writerow([row.get(col, '') for col in columns])
+        writer.writerow([row.get(col, "") for col in columns])
     text_output.flush()
     text_output.detach()
     output.seek(0)
-    return output, 'text/csv', 'reporte.csv'
+    return output, "text/csv", "reporte.csv"

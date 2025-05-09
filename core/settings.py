@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-z@p2rp_aqkts#41suo%40ol(5bb*kl92nyuhhbacm@d*w5_dmj'
+SECRET_KEY = "django-insecure-z@p2rp_aqkts#41suo%40ol(5bb*kl92nyuhhbacm@d*w5_dmj"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -32,68 +32,68 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'accounts',
-    'clients',
-    'vehicles',
-    'contracts',
-    'invoices',
-    'reports',
-    'dashboard',
-    'django_rq',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "accounts",
+    "clients",
+    "vehicles",
+    "contracts",
+    "invoices",
+    "reports",
+    "dashboard",
+    "django_rq",
 ]
 
 RQ_QUEUES = {
-    'default': {
-        'USE_REDIS_CACHE': 'default',
-        'URL': 'redis://127.0.0.1:6379/0',  # Cambia según tu configuración de Redis
-        'DEFAULT_TIMEOUT': 360,
+    "default": {
+        "USE_REDIS_CACHE": "default",
+        "URL": "redis://127.0.0.1:6379/0",  # Cambia según tu configuración de Redis
+        "DEFAULT_TIMEOUT": 360,
     }
 }
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = 'core.urls'
+ROOT_URLCONF = "core.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'core.wsgi.application'
+WSGI_APPLICATION = "core.wsgi.application"
 
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
 }
 
@@ -103,16 +103,16 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
@@ -120,9 +120,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'es'
+LANGUAGE_CODE = "es"
 
-TIME_ZONE = 'America/Bogota'
+TIME_ZONE = "America/Bogota"
 
 USE_I18N = True
 
@@ -132,119 +132,121 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = "static/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Custom User Model
-AUTH_USER_MODEL = 'accounts.User'
+AUTH_USER_MODEL = "accounts.User"
 
-LOGIN_URL = '/accounts/login/'
-LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = "/accounts/login/"
+LOGIN_REDIRECT_URL = "/"
 
-STATIC_URL = '/static/'
+STATIC_URL = "/static/"
 
 # Email settings
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'danielbedoyatests@gmail.com'
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_PASS', 'default_password')  # Use environment variable for security
-DEFAULT_FROM_EMAIL = 'danielbedoyatests@gmail.com'
+EMAIL_HOST_USER = "danielbedoyatests@gmail.com"
+EMAIL_HOST_PASSWORD = os.getenv(
+    "EMAIL_PASS", "default_password"
+)  # Use environment variable for security
+DEFAULT_FROM_EMAIL = "danielbedoyatests@gmail.com"
 
 # Logging configuration
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{asctime} [{levelname}] {name} - {message}',
-            'style': '{',
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "{asctime} [{levelname}] {name} - {message}",
+            "style": "{",
         },
     },
-    'handlers': {
-        'accounts_file': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'log/accounts.log'),
-            'formatter': 'verbose',
+    "handlers": {
+        "accounts_file": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": os.path.join(BASE_DIR, "log/accounts.log"),
+            "formatter": "verbose",
         },
-        'clients_file': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'log/clients.log'),
-            'formatter': 'verbose',
+        "clients_file": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": os.path.join(BASE_DIR, "log/clients.log"),
+            "formatter": "verbose",
         },
-        'vehicles_file': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'log/vehicles.log'),
-            'formatter': 'verbose',
+        "vehicles_file": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": os.path.join(BASE_DIR, "log/vehicles.log"),
+            "formatter": "verbose",
         },
-        'contracts_file': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'log/contracts.log'),
-            'formatter': 'verbose',
+        "contracts_file": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": os.path.join(BASE_DIR, "log/contracts.log"),
+            "formatter": "verbose",
         },
-        'invoices_file': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'log/invoices.log'),
-            'formatter': 'verbose',
+        "invoices_file": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": os.path.join(BASE_DIR, "log/invoices.log"),
+            "formatter": "verbose",
         },
-        'reports_file': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'log/reports.log'),
-            'formatter': 'verbose',
+        "reports_file": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": os.path.join(BASE_DIR, "log/reports.log"),
+            "formatter": "verbose",
         },
-        'dashboard_file': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'log/dashboard.log'),
-            'formatter': 'verbose',
+        "dashboard_file": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": os.path.join(BASE_DIR, "log/dashboard.log"),
+            "formatter": "verbose",
         },
     },
-    'loggers': {
-        'accounts': {
-            'handlers': ['accounts_file'],
-            'level': 'INFO',
-            'propagate': False,
+    "loggers": {
+        "accounts": {
+            "handlers": ["accounts_file"],
+            "level": "INFO",
+            "propagate": False,
         },
-        'clients': {
-            'handlers': ['clients_file'],
-            'level': 'INFO',
-            'propagate': False,
+        "clients": {
+            "handlers": ["clients_file"],
+            "level": "INFO",
+            "propagate": False,
         },
-        'vehicles': {
-            'handlers': ['vehicles_file'],
-            'level': 'INFO',
-            'propagate': False,
+        "vehicles": {
+            "handlers": ["vehicles_file"],
+            "level": "INFO",
+            "propagate": False,
         },
-        'contracts': {
-            'handlers': ['contracts_file'],
-            'level': 'INFO',
-            'propagate': False,
+        "contracts": {
+            "handlers": ["contracts_file"],
+            "level": "INFO",
+            "propagate": False,
         },
-        'invoices': {
-            'handlers': ['invoices_file'],
-            'level': 'INFO',
-            'propagate': False,
+        "invoices": {
+            "handlers": ["invoices_file"],
+            "level": "INFO",
+            "propagate": False,
         },
-        'reports': {
-            'handlers': ['reports_file'],
-            'level': 'INFO',
-            'propagate': False,
+        "reports": {
+            "handlers": ["reports_file"],
+            "level": "INFO",
+            "propagate": False,
         },
-        'dashboard': {
-            'handlers': ['dashboard_file'],
-            'level': 'INFO',
-            'propagate': False,
+        "dashboard": {
+            "handlers": ["dashboard_file"],
+            "level": "INFO",
+            "propagate": False,
         },
     },
 }
