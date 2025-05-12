@@ -6,5 +6,5 @@ REQUIRED_COLUMNS = {
     "Cuota semanal",
     "Marca del auto",
     "Modelo del auto",
-    "Placa del auto"
+    "Placa del auto",
 }

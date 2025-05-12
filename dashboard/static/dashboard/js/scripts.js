@@ -16,14 +16,15 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Check on page load
+    if (checkboxes.length > 0 && reportButtonContainer.length > 0)
     toggleReportButton();
 
     const alerts = document.querySelectorAll('.alert');
     alerts.forEach(function (alert) {
-      setTimeout(() => {
-        alert.style.transition = "opacity 0.5s ease-out";
-        alert.style.opacity = "0";
-        setTimeout(() => alert.remove(), 500);
-      }, 4000);
+        setTimeout(() => {
+            alert.style.transition = "opacity 0.5s ease-out";
+            alert.style.opacity = "0";
+            setTimeout(() => alert.remove(), 500);
+        }, 4000);
     });
 });

@@ -1,0 +1,69 @@
+{% load custom_filters %}
+<hr class="my-4">
+<h5>Roles existentes</h5>
+<div class="accordion mb-4 mx-auto" id="permissionsAccordion" style="width: 60%;">
+    {% for role in roles %}
+    <div class="accordion-item">
+        <h2 class="accordion-header" id="heading{{ forloop.counter }}">
+            <button class="accordion-button collapsed d-flex justify-content-between align-items-center w-100" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ forloop.counter }}" aria-expanded="false" aria-controls="collapse{{ forloop.counter }}">
+                <div class="d-flex justify-content-between align-items-center w-100">
+                    <span class="me-auto">{{ role.name }}</span>
+                    <span class="badge bg-success me-1">{{ role.permissions.count }} permisos</span>
+                    <span class="badge bg-info me-2">{{ role.user_set.count }} usuarios</span>
+                    {% if role.user_set.count == 0 %}
+                        <form action="{% url 'delete_role' role.id %}" method="post" class="m-0 p-0 me-2" onsubmit="return confirm('¿Seguro que deseas eliminar este rol?')">
+                            {% csrf_token %}
+                            <i class="bi bi-x btn btn-outline-danger p-1" onclick="this.closest('form').submit()" style="cursor: pointer;"></i>
+                        </form>
+                    {% endif %}
+                </div>
+            </button>
+        </h2>
+        <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse" aria-labelledby="heading{{ forloop.counter }}" data-bs-parent="#permissionsAccordion">
+            <div class="accordion-body d-flex flex-wrap">
+                {% regroup role.permissions.all by content_type.model as perms_by_model %}
+                {% for model in perms_by_model %}
+                    <div class="w-100">
+                        <strong class="d-block mb-2">{{ model.grouper|capfirst }}</strong>
+                        <div class="d-flex flex-wrap mb-3">
+                            {% for perm in model.list %}
+                            <div class="form-check me-3">
+                                <label class="form-check-label">
+                                    {% if "add" in perm.codename %}
+                                        Puede crear
+                                    {% elif "change" in perm.codename %}
+                                        Puede editar
+                                    {% elif "delete" in perm.codename %}
+                                        Puede eliminar
+                                    {% elif "view" in perm.codename %}
+                                        Puede ver
+                                    {% else %}
+                                        {{ perm.name }}
+                                    {% endif %}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% if field_permissions %}
+                            {% with field_permissions|get_item:role|get_item:model.grouper as fields %}
+                                {% if fields %}
+                                <div class="w-100 mb-2">
+                                    <small class="text-muted">Campos visibles:</small>
+                                    {% for field in fields %}
+                                        <label class="form-check-label">
+                                            {{ field|capfirst }}
+                                        </label>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            {% endwith %}
+                        {% endif %}
+                    </div>
+                {% empty %}
+                    <li class="list-group-item">No hay roles creados aún.</li>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>

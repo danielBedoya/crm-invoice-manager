@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "reports",
     "dashboard",
     "django_rq",
+    "widget_tweaks",
 ]
 
 RQ_QUEUES = {

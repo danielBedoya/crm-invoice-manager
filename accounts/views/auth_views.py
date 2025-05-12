@@ -1,9 +1,11 @@
 from django.contrib.auth.views import LoginView, LogoutView
-from .forms import LoginForm
 from django.urls import reverse_lazy
 import logging
 
-logger = logging.getLogger('accounts')
+from accounts.forms import LoginForm
+
+logger = logging.getLogger("accounts")
+
 
 class CustomLoginView(LoginView):
     """
@@ -17,7 +19,8 @@ class CustomLoginView(LoginView):
         authentication_form (LoginForm): The custom form used for authentication.
         redirect_authenticated_user (bool): Whether to redirect already authenticated users.
     """
-    template_name = 'accounts/login.html'
+
+    template_name = "accounts/login.html"
     authentication_form = LoginForm
     redirect_authenticated_user = True
 
@@ -32,6 +35,7 @@ class CustomLoginView(LoginView):
         logger.warning("Invalid login attempt.")
         return super().form_invalid(form)
 
+
 class CustomLogoutView(LogoutView):
     """
     Custom logout view for handling user logout.
@@ -41,4 +45,5 @@ class CustomLogoutView(LogoutView):
     Attributes:
         next_page (str): URL to redirect to after logout.
     """
-    next_page = reverse_lazy('login')
+
+    next_page = reverse_lazy("login")

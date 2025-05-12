@@ -1,8 +1,30 @@
-<nav class="navbar navbar-light bg-light mb-4">
+<nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
     <div class="container">
-        <span class="navbar-text">
-            Bienvenido, {{ request.user.get_full_name|default:request.user.email }}
-        </span>
-        <a class="btn btn-outline-danger" href="{% url 'logout' %}">Logout</a>
+        <div class="collapse navbar-collapse" id="navbarMenu">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                {% url 'dashboard' as dashboard_url %}
+                {% if request.path != dashboard_url %}
+                    <a class="nav-link" href="{{ dashboard_url }}"><i class="bi bi-chevron-left"></i> Dashboard</a>
+                {% endif %}
+                {% if request.user.is_superuser %}
+                <li class="nav-item dropdown button align-items-center">
+                    <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Administración
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                        <li><a class="dropdown-item" href="{% url 'create_advanced_rol' %}">Crear rol</a></li>
+                        <li><a class="dropdown-item" href="{% url 'create_user' %}">Crear usuario</a></li>
+                    </ul>
+                </li>
+                {% endif %}
+            </ul>
+            <span class="navbar-text me-3">
+                Bienvenido, {{ request.user.get_full_name|default:request.user.email }}
+                {% if request.user.groups.all %}
+                    — Rol: {{ request.user.groups.all.0.name }}
+                {% endif %}
+            </span>
+            <a class="btn btn-outline-danger" href="{% url 'logout' %}">Logout</a>
+        </div>
     </div>
 </nav>

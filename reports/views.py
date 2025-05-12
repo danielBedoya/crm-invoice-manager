@@ -6,7 +6,7 @@ from .tasks import generate_and_send_report
 from django.contrib import messages
 import logging
 
-logger = logging.getLogger('reports')
+logger = logging.getLogger("reports")
 
 
 class ReportView(LoginRequiredMixin, View):
@@ -35,22 +35,30 @@ class ReportView(LoginRequiredMixin, View):
         """
         try:
             user_email = request.user.email
-            selected_columns = request.POST.getlist('columns')
-            format = request.POST.get('format', 'csv')
+            selected_columns = request.POST.getlist("columns")
+            format = request.POST.get("format", "csv")
             data = request.session.get("data", [])
 
-            logger.info(f"Report request by {user_email} for columns: {selected_columns}")
+            logger.info(
+                f"Report request by {user_email} for columns: {selected_columns}"
+            )
 
             if not data:
                 logger.info("No data found")
-                return HttpResponse("No hay datos disponibles para generar el reporte.", status=400)
+                return HttpResponse(
+                    "No hay datos disponibles para generar el reporte.", status=400
+                )
 
             generate_and_send_report.delay(user_email, selected_columns, data, format)
 
-            messages.success(request, "Tu reporte está siendo procesado y será enviado a tu correo.")
-            return redirect('dashboard')
+            messages.success(
+                request, "Tu reporte está siendo procesado y será enviado a tu correo."
+            )
+            return redirect("dashboard")
 
         except Exception as e:
             logger.exception("Error while processing report request")
-            messages.error(request, f"Ocurrió un error al procesar el reporte: {str(e)}")
-            return redirect('dashboard')
+            messages.error(
+                request, f"Ocurrió un error al procesar el reporte: {str(e)}"
+            )
+            return redirect("dashboard")
