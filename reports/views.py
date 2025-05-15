@@ -57,7 +57,7 @@ class ReportView(LoginRequiredMixin, View):
             return redirect("dashboard")
 
         except Exception as e:
-            logger.exception("Error while processing report request")
+            logger.error("Error while processing report request")
             messages.error(
                 request, f"Ocurrió un error al procesar el reporte: {str(e)}"
             )

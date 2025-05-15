@@ -11,7 +11,7 @@ import logging
 
 from accounts.forms import RolePermissionForm
 from clients.models import Client
-from vehicles.models import Vehicle
+from vehicles.models import Vehicle, VehicleModel
 from contracts.models import Contract
 from invoices.models import Invoice
 from accounts.models import FieldPermission
@@ -64,7 +64,7 @@ class CreateAdvancedRoleView(FormView):
                     f"Permissions for model '{model_name}' saved for role '{group.name}'"
                 )
         except Exception as e:
-            logger.exception(
+            logger.error(
                 f"Error saving field permissions for group '{group.name}': {e}"
             )
             raise
@@ -82,7 +82,7 @@ class CreateAdvancedRoleView(FormView):
             logger.info(f"Role '{group.name}' created successfully.")
             return super().form_valid(form)
         except Exception as e:
-            logger.exception(f"Error in form validation: {e}")
+            logger.error(f"Error in form validation: {e}")
             messages.error(self.request, "There was an error creating the role.")
             return self.form_invalid(form)
 
@@ -95,7 +95,7 @@ class CreateAdvancedRoleView(FormView):
 
     def get_context_data(self, **kwargs):
         try:
-            models_list = [Client, Vehicle, Contract, Invoice]
+            models_list = [Client, Vehicle, Contract, Invoice, VehicleModel]
             context = super().get_context_data(**kwargs)
             context["field_options"] = {
                 model._meta.model_name: [
@@ -118,7 +118,7 @@ class CreateAdvancedRoleView(FormView):
             logger.info("Roles and field permissions loaded successfully.")
             return context
         except Exception as e:
-            logger.exception(f"Error loading context data: {e}")
+            logger.error(f"Error loading context data: {e}")
             return super().get_context_data(**kwargs)
 
 
@@ -152,6 +152,6 @@ class DeleteRoleView(LoginRequiredMixin, UserPassesTestMixin, View):
                 logger.info(f"Role '{group.name}' deleted successfully.")
             return redirect("create_advanced_rol")
         except Exception as e:
-            logger.exception(f"Error deleting role: {e}")
+            logger.error(f"Error deleting role: {e}")
             messages.error(request, "There was an error deleting the role.")
             return redirect("create_advanced_rol")

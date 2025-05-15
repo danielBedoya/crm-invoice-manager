@@ -1,6 +1,8 @@
+import uuid
 from django.db import models
 from clients.models import Client
 from vehicles.models import Vehicle
+from django.core.exceptions import ValidationError
 
 
 class Contract(models.Model):
@@ -23,24 +25,44 @@ class Contract(models.Model):
     Methods:
         __str__(): Returns a string representation of the contract, including its ID and associated client.
     """
-
+    uid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     client = models.ForeignKey(Client, on_delete=models.CASCADE, verbose_name="Cliente")
     vehicle = models.ForeignKey(
         Vehicle, on_delete=models.CASCADE, verbose_name="Vehículo"
     )
     start_date = models.DateField("Inicio de contrato")
     weekly_payment = models.DecimalField(
-        "Cuota semanal", max_digits=10, decimal_places=2
+        "Monto de cada cuota", max_digits=10, decimal_places=2
     )
 
-    STATUS_CHOICES = [
-        ("activo", "Activo"),
-        ("cancelado", "Cancelado"),
-        ("finalizado", "Finalizado"),
+    BILLING_CYCLE_CHOICES = [
+        ("weekly", "Semanal"),
+        ("biweekly", "Quincenal"),
+        ("monthly", "Mensual"),
     ]
-    status = models.CharField(
-        "Estado", max_length=20, choices=STATUS_CHOICES, default="activo"
+    billing_cycle = models.CharField(
+        "Ciclo de facturación",
+        max_length=10,
+        choices=BILLING_CYCLE_CHOICES,
+        default="weekly"
     )
+
+    active = models.BooleanField("¿Está activo?", default=True)
+    amount = models.DecimalField(
+        "Valor total del contrato", max_digits=10, decimal_places=2, default=0
+    )
+
+    def clean(self):
+        if self.active:
+            existing = Contract.objects.filter(client=self.client, active=True)
+            if self.pk:
+                existing = existing.exclude(pk=self.pk)
+            if existing.exists():
+                raise ValidationError("Este cliente ya tiene un contrato activo.")
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Contrato #{self.id} — {self.client}"

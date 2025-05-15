@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "dashboard",
     "django_rq",
     "widget_tweaks",
+    "core",
 ]
 
 RQ_QUEUES = {

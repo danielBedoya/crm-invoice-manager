@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from contracts.models import Contract
 
@@ -10,6 +11,7 @@ class Invoice(models.Model):
     including issue date, due date, amount, and payment status.
 
     Attributes:
+        uid (UUIDField): A unique identifier for the invoice (auto-generated).
         contract (ForeignKey): A reference to the associated contract (Contract model).
         issue_date (DateField): The date the invoice was issued.
         due_date (DateField): The due date for the invoice payment.
@@ -23,6 +25,7 @@ class Invoice(models.Model):
         __str__(): Returns a string representation of the invoice, including its ID and associated contract.
     """
 
+    uid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     contract = models.ForeignKey(
         Contract, on_delete=models.CASCADE, verbose_name="Contrato"
     )
@@ -40,6 +43,9 @@ class Invoice(models.Model):
         max_length=20,
         choices=PAYMENT_STATUS_CHOICES,
         default="pendiente",
+    )
+    period_key = models.CharField(
+        "Periodo de facturación", max_length=20, blank=True, null=True
     )
 
     def __str__(self):

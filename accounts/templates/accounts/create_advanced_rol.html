@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load widget_tweaks %}
-{% load custom_filters %}
+{% load common_custom_filters %}
 {% block content %}
 <h3>Administrar roles</h3>
 <form method="post" action="{% url 'create_advanced_rol' %}" class="card mx-auto p-5" style="width: 60%;">
@@ -22,43 +22,24 @@
                     <div id="collapse{{ forloop.counter }}-create" class="accordion-collapse collapse" aria-labelledby="heading{{ forloop.counter }}" data-bs-parent="#permissionsAccordion">
                         <div class="accordion-body d-flex flex-wrap">
                             {% for perm in data.permissions %}
-                            <div class="form-check me-3">
-                                <input class="form-check-input" type="checkbox" name="permissions" value="{{ perm.id }}" id="perm{{ perm.id }}"
-                                {% if perm in form.cleaned_data.permissions %}checked{% endif %}>
-                                <label class="form-check-label" for="perm{{ perm.id }}">
-                                    {% if "add" in perm.codename %}
-                                        Puede crear
-                                    {% elif "change" in perm.codename %}
-                                        Puede editar
-                                    {% elif "delete" in perm.codename %}
-                                        Puede eliminar
-                                    {% elif "view" in perm.codename %}
-                                        Puede ver
-                                    {% else %}
-                                        {{ perm.name }}
-                                    {% endif %}
-                                </label>
-                            </div>
+                            {% if not "change" in perm.codename %}
+                                <div class="form-check me-3">
+                                    <input class="form-check-input" type="checkbox" name="permissions" value="{{ perm.id }}" id="perm{{ perm.id }}"
+                                    {% if perm.id|stringformat:"s" in request.POST|get_item:"permissions" %}checked{% endif %}>
+                                    <label class="form-check-label" for="perm{{ perm.id }}">
+                                        {% if "add" in perm.codename %}
+                                            Puede crear
+                                        {% elif "delete" in perm.codename %}
+                                            Puede eliminar
+                                        {% elif "view" in perm.codename %}
+                                            Puede ver
+                                        {% else %}
+                                            {{ perm.name }}
+                                        {% endif %}
+                                    </label>
+                                </div>
+                            {% endif %}
                             {% endfor %}
-                            {% with model_name|lower as model_key %}
-                                {% with field_options|get_item:model_key as model_fields %}
-                                {% if model_fields %}
-                                    <div class="w-100 mt-3">
-                                        <h6>Campos visibles en el Dashboard</h6>
-                                        <div class="d-flex flex-wrap">
-                                            {% for field in model_fields %}
-                                            <div class="form-check me-3">
-                                                <input class="form-check-input" type="checkbox" name="allowed_fields" value="{{ model_name }}__{{ field }}" id="field_{{ model_name }}_{{ field }}">
-                                                <label class="form-check-label" for="field_{{ model_name }}_{{ field }}">
-                                                    {{ field|capfirst }}
-                                                </label>
-                                            </div>
-                                            {% endfor %}
-                                        </div>
-                                    </div>
-                                {% endif %}
-                                {% endwith %}
-                            {% endwith %}
                         </div>
                     </div>
                 </div>

@@ -1,4 +1,4 @@
-import json
+import json, uuid
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Group
 from django.contrib.contenttypes.models import ContentType
@@ -17,7 +17,7 @@ class User(AbstractUser):
         USERNAME_FIELD (str): Specifies the field to be used as the unique identifier.
         REQUIRED_FIELDS (list): Specifies the required fields other than the USERNAME_FIELD.
     """
-
+    uid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     email = models.EmailField(unique=True)
 
     USERNAME_FIELD = "email"

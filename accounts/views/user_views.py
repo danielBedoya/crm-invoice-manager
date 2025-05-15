@@ -11,6 +11,7 @@ from accounts.forms import CrearUsuarioForm
 
 User = get_user_model()
 
+
 class CreateUserView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     """
     View for creating a new user.
@@ -38,6 +39,9 @@ class CreateUserView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
 
     def form_valid(self, form):
         try:
+            if not form.instance.username:
+                form.instance.username = form.cleaned_data["email"]
+
             response = super().form_valid(form)
             messages.success(self.request, "Usuario creado exitosamente.")
             logging.info(f"Usuario creado: {form.instance.email}")
@@ -76,6 +80,7 @@ class DeleteUserView(LoginRequiredMixin, UserPassesTestMixin, View):
         post(request, pk): Handles the deletion of a user with the given primary key (pk).
         test_func(): Ensures that the current user is a superuser.
     """
+
     def post(self, request, pk):
         try:
             user = get_object_or_404(User, pk=pk)

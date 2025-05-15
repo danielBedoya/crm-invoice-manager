@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
+from django.shortcuts import redirect
 import logging
 
 from dashboard.utils.file_processor import process_excel_file, process_csv_file
@@ -34,6 +35,10 @@ class DashboardView(LoginRequiredMixin, View):
             HttpResponse: The rendered dashboard page.
         """
         try:
+            user = self.request.user
+            if not user.is_superuser:
+                return redirect("role_dashboard")
+            
             q = request.GET.get("q")
             data = request.session.get("data", [])
 
@@ -54,7 +59,7 @@ class DashboardView(LoginRequiredMixin, View):
             return render(request, self.template_name)
 
         except Exception as e:
-            logger.exception("Unexpected error during GET request to dashboard")
+            logger.error("Unexpected error during GET request to dashboard")
             return render(
                 request,
                 self.template_name,
@@ -122,7 +127,7 @@ class DashboardView(LoginRequiredMixin, View):
             return render(request, self.template_name, {"page_obj": page_obj})
 
         except Exception as e:
-            logger.exception("Unexpected error during file upload")
+            logger.error("Unexpected error during file upload")
             return render(
                 request,
                 self.template_name,

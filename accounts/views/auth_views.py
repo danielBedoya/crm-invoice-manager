@@ -35,6 +35,12 @@ class CustomLoginView(LoginView):
         logger.warning("Invalid login attempt.")
         return super().form_invalid(form)
 
+    def get_success_url(self):
+        user = self.request.user
+        if user.is_superuser:
+            return reverse_lazy("dashboard")
+        return reverse_lazy("role_dashboard")
+
 
 class CustomLogoutView(LogoutView):
     """

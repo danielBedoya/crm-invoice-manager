@@ -41,4 +41,4 @@ def generate_and_send_report(user_email, selected_columns, data, format="xlsx"):
         email.attach(filename, file_stream.read(), mime_type)
         email.send()
     except Exception as e:
-        logger.exception(f"Failed to generate or send report to {user_email}: {str(e)}")
+        logger.error(f"Failed to generate or send report to {user_email}: {str(e)}")

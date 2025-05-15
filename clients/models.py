@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 
 
@@ -9,6 +10,7 @@ class Client(models.Model):
     details and contact information.
 
     Attributes:
+        uid (UUIDField): A unique identifier for the client (auto-generated).
         first_name (CharField): The first name of the client (max length: 100).
         last_name (CharField): The last name of the client (max length: 100).
         document_number (CharField): A unique identifier for the client (e.g., ID or document number, max length: 30).
@@ -19,6 +21,7 @@ class Client(models.Model):
         __str__(): Returns the full name of the client as a string.
     """
 
+    uid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     first_name = models.CharField("Nombres", max_length=100)
     last_name = models.CharField("Apellidos", max_length=100)
     document_number = models.CharField(

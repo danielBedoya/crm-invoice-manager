@@ -5,7 +5,6 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.contrib.contenttypes.models import ContentType
 
-from .models import FieldPermission
 
 User = get_user_model()
 
@@ -104,7 +103,7 @@ class RolePermissionForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        allowed_models = ["client", "vehicle", "contract", "invoice"]
+        allowed_models = ["client", "vehicle", "contract", "invoice", "vehiclemodel"]
         content_types = ContentType.objects.filter(model__in=allowed_models)
         self.fields["permissions"].queryset = Permission.objects.filter(
             content_type__in=content_types
@@ -116,6 +115,7 @@ class RolePermissionForm(forms.Form):
             "vehicle": "Vehículo",
             "contract": "Contrato",
             "invoice": "Factura",
+            "vehiclemodel": "Modelo de vehículo",
         }
         grouped = {}
 

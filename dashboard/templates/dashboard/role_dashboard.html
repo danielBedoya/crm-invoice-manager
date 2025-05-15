@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% load common_custom_filters %}
+
+{% block content %}
+<div class="container mt-4">
+    <h3 class="mb-4">{{ titulo }}</h3>
+
+    {% if form_fields and form_action %}
+        <form method="post" action="{% url form_action %}" class="mb-4">
+            {% csrf_token %}
+            <div class="row">
+                {% for field in form_fields %}
+                    <div class="col-md-4 mb-2">
+                        <label class="form-label">{{ field|title }}</label>
+                        <input type="text" name="{{ field }}" class="form-control" required>
+                    </div>
+                {% endfor %}
+            </div>
+            <button type="submit" class="btn btn-primary">Crear</button>
+        </form>
+    {% endif %}
+
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          {% for key in headers.values %}
+            <th>{{ headers.labels|get_item:key }}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+          <tr>
+            {% for key in headers.values %}
+              <td>{{ row|get_item:key }}</td>
+            {% endfor %}
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="{{ headers.values|length }}">No hay registros para mostrar.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% if is_paginated %}
+    <nav>
+      <ul class="pagination">
+        {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+          </li>
+        {% endif %}
+
+        <li class="page-item active">
+          <span class="page-link">
+            Página {{ page_obj.number }} de {{ paginator.num_pages }}
+          </span>
+        </li>
+
+        {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+    {% endif %}
+
+{% if create_instances %}
+<hr>
+<h4 class="mb-3">Crear nueva instancia</h4>
+<div class="accordion" id="createAccordion">
+    {% for instance in create_instances %}
+    <div class="accordion-item">
+        <h2 class="accordion-header" id="heading{{ forloop.counter }}">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ forloop.counter }}" aria-expanded="false" aria-controls="collapse{{ forloop.counter }}">
+                {{ instance.nombre_modelo }}
+            </button>
+        </h2>
+        <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse" aria-labelledby="heading{{ forloop.counter }}" data-bs-parent="#createAccordion">
+            <div class="accordion-body">
+                <form method="post" action="{% url 'manage_'|add:instance.model|lower %}">
+                    {% csrf_token %}
+                    <div class="row">
+                        {% for field in instance.fields %}
+                            <div class="col-md-4 mb-2">
+                                <label class="form-label">{{ field.label }}</label>
+                                {% if field.type == "select" %}
+                                    <select name="{{ field.name }}" class="form-control" {% if field.required %}required{% endif %}>
+                                        <option value="" selected disabled>Seleccione una opción</option>
+                                        {% for choice in field.choices %}
+                                            <option value="{{ choice.value }}">{{ choice.label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                {% else %}
+                                    {% if field.type == "date" %}
+                                        {% if field.name != "birthday" %}
+                                            <input 
+                                                type="date"
+                                                name="{{ field.name }}" 
+                                                class="form-control" 
+                                                min="{% now 'Y-m-d' %}"
+                                                {% if field.required %}required{% endif %}
+                                            />
+                                        {% else %}
+                                            <input 
+                                                type="date"
+                                                name="birthday" 
+                                                class="form-control"
+                                                {% if field.required %}required{% endif %}
+                                            />
+                                        {% endif %}
+                                    {% elif field.type == "checkbox" %}
+                                        <select name="{{ field.name }}" class="form-control" {% if field.required %}required{% endif %}>
+                                            <option value="true">Sí</option>
+                                            <option value="false">No</option>
+                                        </select>
+                                    {% else %}
+                                        <input 
+                                            type="{{ field.type|default:'text' }}" 
+                                            name="{{ field.name }}" 
+                                            class="form-control" 
+                                            {% if field.required %}required{% endif %} 
+                                            {% if field.pattern %}pattern="{{ field.pattern }}"{% endif %} 
+                                        />
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <button type="submit" class="btn btn-success mt-2">Crear {{ instance.nombre_modelo }}</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+</div>
+{% endblock %}
