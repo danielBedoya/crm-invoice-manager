@@ -89,6 +89,6 @@ def get_context(user):
         },
     }
 
-    context = {"headers": headers, "rows": rows, "pagination": 20}
+    context = {"headers": headers, "rows": rows, "pagination": 10}
 
     return context

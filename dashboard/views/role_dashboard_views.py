@@ -2,7 +2,6 @@ from django.core.paginator import Paginator
 from django.shortcuts import render
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 import logging, re
 
@@ -52,10 +51,11 @@ class RoleDashboardView(LoginRequiredMixin, View):
             app_context_path = f"dashboard.role_context_builders.{normalized_name}"
             module = __import__(app_context_path, fromlist=["get_context"])
             context = module.get_context(self.request.user)
+            model_cts = ContentType.objects.filter(permission__group=self.request.user.groups.all()[0]).distinct()
 
             create_instances = []
-            for model in apps.get_models():
-                content_type = ContentType.objects.get_for_model(model)
+            for content_type in model_cts:
+                model = content_type.model_class()
                 perm_codename = f"{content_type.app_label}.add_{content_type.model}"
                 if self.request.user.has_perm(perm_codename):
                     fields = []

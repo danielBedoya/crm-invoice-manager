@@ -2,9 +2,11 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
 from django.shortcuts import redirect
 from django.contrib import messages
+from django.db.models import Prefetch
 import logging
 
 from .models import Client
+from contracts.models import Contract
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +23,7 @@ class CreateClientInstanceView(LoginRequiredMixin, View):
             On success, adds a success message and redirects to the role dashboard.
             On failure, logs the exception, adds an error message, and redirects to the role dashboard.
     """
+
     def post(self, request):
         try:
             data = {k: v for k, v in request.POST.items() if k != "csrfmiddlewaretoken"}
@@ -42,13 +45,22 @@ class CreateClientInstanceView(LoginRequiredMixin, View):
         Returns:
             QuerySet: A queryset of Client objects, filtered according to the request parameters, or an empty queryset on error.
         """
-        
-        try:
-            clientes = Client.objects.all().prefetch_related('contract_set__vehicle')
 
-            filters = {k: v for k, v in request.GET.items() if k in [field.name for field in Client._meta.fields]}
-            if filters:
-                clientes = clientes.filter(**filters)
+        try:
+            filters = {
+                k: v
+                for k, v in request.GET.items()
+                if k in [field.name for field in Client._meta.fields]
+            }
+
+            clientes = Client.objects.filter(**filters).prefetch_related(
+                Prefetch(
+                    "contract_set",
+                    queryset=Contract.objects.filter(active=True)
+                    .select_related("vehicle", "vehicle__vehicle_model", "client"),
+                    to_attr="active_contracts",
+                ),
+            )
 
             return clientes
         except Exception as e:

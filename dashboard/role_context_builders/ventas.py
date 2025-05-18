@@ -27,15 +27,17 @@ def get_context(user):
     clients_qs = CreateClientInstanceView().get(fake_request)
 
     clients_list = []
+    
     for client in clients_qs:
-        active_contract = client.contract_set.filter(active=True).first()
+        active_contract = client.active_contracts[0] if client.active_contracts else None
+        has_active_contract = active_contract is not None
         clients_list.append(
             {
                 "full_name": f"{client.first_name} {client.last_name}",
                 "document_number": client.document_number,
-                "active_contract": "Si" if active_contract is not None else "No",
+                "active_contract": "Si" if has_active_contract else "No",
                 "linked_vehicle": (
-                    str(active_contract.vehicle) if active_contract else "No tiene contrato activo"
+                    str(active_contract.vehicle) if has_active_contract else "No tiene contrato activo"
                 ),
             }
         )
@@ -51,7 +53,6 @@ def get_context(user):
             },
         },
         "rows": clients_list,
-        "pagination": 20,
+        "pagination": 5,
     }
-
     return context
