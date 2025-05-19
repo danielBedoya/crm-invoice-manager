@@ -2,9 +2,12 @@ from django.shortcuts import redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
 from django.contrib import messages
+from django.db.models import Prefetch
 import logging
 
 from vehicles.models import Vehicle, VehicleModel
+from contracts.models import Contract
+from invoices.models import Invoice
 
 logger = logging.getLogger(__name__)
 
@@ -28,20 +31,44 @@ class CreateVehicleInstanceView(LoginRequiredMixin, View):
         """
         Returns a filtered list of vehicles.
         """
-        vehicles = Vehicle.objects.select_related("vehicle_model").all()
         filters = {
-            k: v for k, v in request.GET.items()
+            k: v
+            for k, v in request.GET.items()
             if k in [field.name for field in Vehicle._meta.fields]
         }
-        if filters:
-            vehicles = vehicles.filter(**filters)
+        vehicles = (
+            Vehicle.objects.filter(**filters)
+            .select_related("vehicle_model")
+            .prefetch_related(
+                Prefetch(
+                    "contract_set",
+                    queryset=Contract.objects.filter(active=True),
+                    to_attr="active_contracts",
+                ),
+                Prefetch(
+                    "contract_set",
+                    queryset=Contract.objects.filter(active=False).order_by(
+                        "-start_date"
+                    ).prefetch_related(Prefetch(
+                        "invoice_set",
+                        queryset=Invoice.objects.all().order_by("-issue_date"),
+                        to_attr="invoices",
+                    )),
+                    to_attr="ended_contracts",
+                ),
+            )
+            .all()
+        )
+
         return vehicles
 
     def post(self, request):
         try:
             data = {k: v for k, v in request.POST.items() if k != "csrfmiddlewaretoken"}
             if "vehicle_model" in data:
-                data["vehicle_model"] = VehicleModel.objects.get(pk=data["vehicle_model"])
+                data["vehicle_model"] = VehicleModel.objects.get(
+                    pk=data["vehicle_model"]
+                )
             Vehicle.objects.create(**data)
             messages.success(request, "Vehículo creado exitosamente.")
         except Exception as e:

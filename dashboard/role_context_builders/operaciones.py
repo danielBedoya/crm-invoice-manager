@@ -41,33 +41,26 @@ def get_context(user):
     for vehicle in vehicles:
         last_contract_end = ""
         days_since_last_contract = "N/A"
-        active_contract = vehicle.contract_set.filter(active=True).first()
+        active_contract = vehicle.active_contracts[0] if vehicle.active_contracts else None
         if not active_contract:
-            last_contract_ended = (
-                vehicle.contract_set.filter(active=False)
-                .order_by("-start_date")
-                .first()
-                or "N/A"
-            )
+            last_contract_ended = vehicle.ended_contracts[0] if vehicle.ended_contracts else "N/A"
             if last_contract_ended and last_contract_ended != "N/A":
-                last_invoice = last_contract_ended.invoices.order_by(
-                    "-issued_date"
-                ).first()
-                last_contract_end = last_invoice.issued_date if last_invoice else ""
+                last_invoice = last_contract_ended.invoices[0] if last_contract_ended.invoices else None
+                last_contract_end = last_invoice.issue_date if last_invoice else ""
                 days_since_last_contract = (
                     (now().date() - last_contract_end).days
                     if last_contract_end
                     else "N/A"
                 )
+        vehicle_model = vehicle.vehicle_model or None
         row = {
-            "brand": vehicle.vehicle_model.brand if vehicle.vehicle_model else None,
-            "model": vehicle.vehicle_model.model if vehicle.vehicle_model else None,
+            "brand": vehicle_model.brand if vehicle.vehicle_model else None,
+            "model": vehicle_model.model if vehicle.vehicle_model else None,
             "plate": vehicle.license_plate,
-            "active_contract": bool(active_contract),
-            "last_contract_end": last_contract_end,
+            "active_contract": "Si" if bool(active_contract) else "No",
+            "last_contract_end": last_contract_end if last_contract_end else "No ha tenido contrato",
             "days_since_last_contract": days_since_last_contract,
         }
-
         rows.append(row)
 
     headers = {

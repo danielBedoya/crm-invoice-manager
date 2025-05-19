@@ -2,6 +2,8 @@ import logging
 import math
 from django.test import RequestFactory
 from django.utils.timezone import now
+from django.db import connection
+
 from contracts.views import DashboardContractListView
 
 logger = logging.getLogger(__name__)
@@ -46,8 +48,7 @@ def get_context(user):
             "active": "Si" if contract.active else "No",
             "vehicle_info": str(vehicle) if vehicle else "Sin vehículo"
         }
-        paid_invoices = contract.invoice_set.filter(payment_status="pagado")
-        total_paid = sum(invoice.amount for invoice in paid_invoices)
+        total_paid = sum(invoice.amount for invoice in contract.paid_invoices)
         remaining_amount = max(contract.amount - total_paid, 0)
         pending_installments = math.ceil(remaining_amount / contract.weekly_payment) if contract.weekly_payment else 0
         row["pending_installments"] = pending_installments

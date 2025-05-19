@@ -3,11 +3,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
 from django.contrib import messages
 from django.views.generic import ListView
+from django.db.models import Prefetch
 import logging
 
 from .models import Contract
 from clients.models import Client
 from vehicles.models import Vehicle
+from invoices.models import Invoice
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +28,7 @@ class CreateContractInstanceView(LoginRequiredMixin, View):
             On success, adds a success message and redirects to the role dashboard.
             On failure, logs the exception, adds an error message, and redirects to the role dashboard.
     """
-    
+
     def post(self, request):
         try:
             data = {k: v for k, v in request.POST.items() if k != "csrfmiddlewaretoken"}
@@ -44,7 +46,7 @@ class CreateContractInstanceView(LoginRequiredMixin, View):
                     messages.error(request, "El vehículo ya tiene un contrato activo.")
                     return redirect("role_dashboard")
                 data["vehicle"] = vehicle
-            
+
             if "active" in data:
                 data["active"] = bool(data["active"])
 
@@ -64,15 +66,24 @@ class DashboardContractListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         try:
-            queryset = Contract.objects.select_related("client", "vehicle").all()
+            filter_params = {k: v for k, v in self.request.GET.items() if v}
 
-            filter_params = {
-                k: v for k, v in self.request.GET.items() if v
-            }
+            logger.debug(
+                f"[DashboardContractListView] Filtros dinámicos: {filter_params}"
+            )
 
-            logger.debug(f"[DashboardContractListView] Filtros dinámicos: {filter_params}")
-
-            return queryset.filter(**filter_params)
+            return (
+                Contract.objects
+                .filter(**filter_params)
+                .select_related("client", "vehicle", "vehicle__vehicle_model")
+                .prefetch_related(
+                    Prefetch(
+                        "invoice_set",
+                        queryset=Invoice.objects.filter(payment_status="pagado"),
+                        to_attr="paid_invoices",
+                    ),
+                )
+            )
         except Exception as e:
             logger.error(f"[DashboardContractListView] Error al aplicar filtros: {e}")
             return Contract.objects.none()

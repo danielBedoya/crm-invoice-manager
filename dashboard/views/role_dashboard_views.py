@@ -5,6 +5,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.contenttypes.models import ContentType
 import logging, re
 
+from vehicles.models import Vehicle, VehicleModel
+
 
 logger = logging.getLogger("dashboard")
 
@@ -47,16 +49,24 @@ class RoleDashboardView(LoginRequiredMixin, View):
             )
 
     def get_context_data(self, normalized_name=None, **kwargs):
+        preloaded_querysets = {
+            "vehicle": Vehicle.objects.all().select_related("vehicle_model"),
+            "vehiclemodel": VehicleModel.objects.all(),
+        }
+
         try:
             app_context_path = f"dashboard.role_context_builders.{normalized_name}"
             module = __import__(app_context_path, fromlist=["get_context"])
             context = module.get_context(self.request.user)
-            model_cts = ContentType.objects.filter(permission__group=self.request.user.groups.all()[0]).distinct()
-
+            model_cts = ContentType.objects.filter(
+                permission__group=self.request.user.groups.all()[0]
+            ).distinct()
+            related_model_cache = {}
             create_instances = []
             for content_type in model_cts:
                 model = content_type.model_class()
-                perm_codename = f"{content_type.app_label}.add_{content_type.model}"
+                model_name = model.__name__.lower()
+                perm_codename = f"{content_type.app_label}.add_{model_name}"
                 if self.request.user.has_perm(perm_codename):
                     fields = []
                     for field in model._meta.fields:
@@ -65,15 +75,32 @@ class RoleDashboardView(LoginRequiredMixin, View):
                             if field.choices:
                                 field_type = "select"
                                 field_choices = [
-                                    {"value": choice[0], "label": choice[1]} for choice in field.choices
+                                    {"value": choice[0], "label": choice[1]}
+                                    for choice in field.choices
                                 ]
-                            elif field.is_relation and hasattr(field, 'remote_field') and field.remote_field.model:
+                            elif (
+                                field.is_relation
+                                and hasattr(field, "remote_field")
+                                and field.remote_field.model
+                            ):
                                 field_type = "select"
                                 related_model = field.remote_field.model
+                                if related_model not in related_model_cache:
+                                    related_model_cache[related_model] = list(
+                                        preloaded_querysets.get(
+                                            related_model.__name__.lower(),
+                                            related_model.objects.all(),
+                                        )
+                                    )
+
                                 field_choices = [
-                                    {"value": obj.pk, "label": str(obj)} for obj in related_model.objects.all()
+                                    {"value": obj.pk, "label": str(obj)}
+                                    for obj in related_model_cache[related_model]
                                 ]
-                            elif field.get_internal_type() in ["BooleanField", "NullBooleanField"]:
+                            elif field.get_internal_type() in [
+                                "BooleanField",
+                                "NullBooleanField",
+                            ]:
                                 field_type = "checkbox"
                                 field_choices = None
                             else:
@@ -107,16 +134,14 @@ class RoleDashboardView(LoginRequiredMixin, View):
                         create_instances.append(
                             {
                                 "model": model.__name__,
-                                "action": f"{content_type.app_label}:create_{content_type.model}",
+                                "action": f"{content_type.app_label}:create_{model_name}",
                                 "nombre_modelo": model._meta.verbose_name.capitalize(),
                                 "fields": fields,
                             }
                         )
-
             if create_instances:
                 context["create_instances"] = create_instances
 
-    
             rows = context.get("rows", [])
             paginator = Paginator(rows, context.get("pagination", 20))
             page_number = self.request.GET.get("page")
@@ -126,7 +151,6 @@ class RoleDashboardView(LoginRequiredMixin, View):
             context["page_obj"] = page_obj
             context["paginator"] = paginator
             context["is_paginated"] = page_obj.has_other_pages()
-
             return context
         except ImportError:
             logger.warning(f"No context builder found for: {normalized_name}")
