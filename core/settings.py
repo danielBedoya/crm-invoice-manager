@@ -53,8 +53,7 @@ INSTALLED_APPS = [
 
 RQ_QUEUES = {
     "default": {
-        "USE_REDIS_CACHE": "default",
-        "URL": "redis://127.0.0.1:6379/0",  # Cambia según tu configuración de Redis
+        "URL": os.environ.get("REDIS_URL", "redis://127.0.0.1:6379/0"),
         "DEFAULT_TIMEOUT": 360,
     }
 }
