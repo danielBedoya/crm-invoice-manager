@@ -10,4 +10,5 @@ urlpatterns = [
     path("contracts/", include("contracts.urls")),
     path("vehicles/", include("vehicles.urls")),
     path("clients/", include("clients.urls")),
+    path("django-rq/", include("django_rq.urls")),
 ]
