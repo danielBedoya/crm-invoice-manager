@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: crm-invoice-manager
+    env: python
+    region: oregon  # Asegúrate de que coincida con la región de tu base de datos
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn core.wsgi:application"
+    envVars:
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: crm-invoice-db
+          property: connectionString
+      - key: EMAIL_HOST_USER
+        value: "danielbedoyatests@gmail.com"
+      - key: EMAIL_PASS
+        sync: false  # Puedes establecer este valor manualmente en el dashboard de Render
+databases:
+  - name: crm-invoice-db
+    region: oregon
+    plan: free  

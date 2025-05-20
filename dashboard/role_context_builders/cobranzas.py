@@ -29,7 +29,7 @@ def get_context(user):
 
     factory = RequestFactory()
     request = factory.get("/fake-url")
-    request.user = user
+    #request.user = user
 
     view = DashboardContractListView()
     view.request = request
@@ -73,5 +73,6 @@ def get_context(user):
         "rows": rows,
         "pagination": 20,
     }
+    print(len(connection.queries))
 
     return context
