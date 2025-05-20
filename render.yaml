@@ -3,6 +3,7 @@ services:
     name: crm-invoice-manager
     env: python
     region: oregon
+    plan: free
     buildCommand: "./build.sh"
     startCommand: "gunicorn core.wsgi:application"
     envVars:
@@ -12,11 +13,52 @@ services:
         fromDatabase:
           name: crm-invoice-db
           property: connectionString
+      - key: REDIS_URL
+        fromService:
+          name: redis-instance
+          type: redis
+          property: connectionString
       - key: EMAIL_HOST_USER
         value: "danielbedoyatests@gmail.com"
       - key: EMAIL_PASS
         sync: false
+      - key: DJANGO_SUPERUSER_USERNAME
+        value: "admin"
+      - key: DJANGO_SUPERUSER_EMAIL
+        value: "admin@example.com"
+      - key: DJANGO_SUPERUSER_PASSWORD
+        value: "securepassword"
+
+  - type: worker
+    name: rq-worker
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: "./build.sh"
+    startCommand: "python manage.py rqworker"
+    envVars:
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: crm-invoice-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          name: redis-instance
+          type: redis
+          property: connectionString
+      - key: EMAIL_HOST_USER
+        value: "danielbedoyatests@gmail.com"
+      - key: EMAIL_PASS
+        sync: false
+
 databases:
   - name: crm-invoice-db
+    region: oregon
+    plan: free
+
+keyValueStores:
+  - name: redis-instance
     region: oregon
     plan: free
