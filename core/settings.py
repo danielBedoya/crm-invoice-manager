@@ -27,7 +27,7 @@ SECRET_KEY = SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'DEFAULT_SECRET_KE
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["127.0.0.1"]
+ALLOWED_HOSTS = ["127.0.0.1", "https://crm-invoice-manager.onrender.com", "crm-invoice-manager.onrender.com"]
 
 
 # Application definition
