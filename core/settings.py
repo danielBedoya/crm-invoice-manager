@@ -160,7 +160,7 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = "danielbedoyatests@gmail.com"
 EMAIL_HOST_PASSWORD = os.getenv(
-    "EMAIL_PASS", "nwxh kalm owph wxih"
+    "EMAIL_PASS", "pass"
 )  # Use environment variable for security
 DEFAULT_FROM_EMAIL = "danielbedoyatests@gmail.com"
 
@@ -169,6 +169,10 @@ INTERNAL_IPS = [
 ]
 
 # Logging configuration
+LOG_DIR = os.path.join(BASE_DIR, 'log')
+if not os.path.exists(LOG_DIR):
+    os.makedirs(LOG_DIR)
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
