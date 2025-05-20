@@ -2,7 +2,7 @@ services:
   - type: web
     name: crm-invoice-manager
     env: python
-    region: oregon  # Asegúrate de que coincida con la región de tu base de datos
+    region: oregon
     buildCommand: "./build.sh"
     startCommand: "gunicorn core.wsgi:application"
     envVars:
@@ -15,8 +15,8 @@ services:
       - key: EMAIL_HOST_USER
         value: "danielbedoyatests@gmail.com"
       - key: EMAIL_PASS
-        sync: false  # Puedes establecer este valor manualmente en el dashboard de Render
+        sync: false
 databases:
   - name: crm-invoice-db
     region: oregon
-    plan: free  
+    plan: free
