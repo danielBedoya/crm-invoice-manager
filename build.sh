@@ -13,7 +13,7 @@ python manage.py migrate
 
 # Create superuser if not already exists
 if [[ -z "${DJANGO_SUPERUSER_USERNAME}" || -z "${DJANGO_SUPERUSER_EMAIL}" || -z "${DJANGO_SUPERUSER_PASSWORD}" ]]; then
-  echo "Las variables de entorno para el superusuario no están completamente definidas. Omitiendo la creación del superusuario."
+  echo "Environment variables for superuser are not set. Skipping superuser creation."
 else
   python manage.py createsuperuser --noinput || echo "Superuser already exists."
 fi
