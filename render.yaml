@@ -52,13 +52,3 @@ services:
         value: "danielbedoyatests@gmail.com"
       - key: EMAIL_PASS
         sync: false
-
-databases:
-  - name: crm-invoice-db
-    region: oregon
-    plan: free
-
-keyValueStores:
-  - name: redis-instance
-    region: oregon
-    plan: free
